@@ -229,30 +229,36 @@ impl Matrix4 {
         }
     }
 
+    /// https://stackoverflow.com/a/44446912/2083075 for optimized scalar version
     #[rustfmt::skip]
     pub fn inverse(&self) -> Option<Self> {
-        let a = self;
+        let m = self;
 
-        let inv = Matrix4 {
-            m00:  a.m11*a.m22*a.m33 - a.m11*a.m23*a.m32 - a.m21*a.m12*a.m33 + a.m21*a.m13*a.m32 + a.m31*a.m12*a.m23 - a.m31*a.m13*a.m22,
-            m01: -a.m01*a.m22*a.m33 + a.m01*a.m23*a.m32 + a.m21*a.m02*a.m33 - a.m21*a.m03*a.m32 - a.m31*a.m02*a.m23 + a.m31*a.m03*a.m22,
-            m02:  a.m01*a.m12*a.m33 - a.m01*a.m13*a.m32 - a.m11*a.m02*a.m33 + a.m11*a.m03*a.m32 + a.m31*a.m02*a.m13 - a.m31*a.m03*a.m12,
-            m03: -a.m01*a.m12*a.m23 + a.m01*a.m13*a.m22 + a.m11*a.m02*a.m23 - a.m11*a.m03*a.m22 - a.m21*a.m02*a.m13 + a.m21*a.m03*a.m12,
-            m10: -a.m10*a.m22*a.m33 + a.m10*a.m23*a.m32 + a.m20*a.m12*a.m33 - a.m20*a.m13*a.m32 - a.m30*a.m12*a.m23 + a.m30*a.m13*a.m22,
-            m11:  a.m00*a.m22*a.m33 - a.m00*a.m23*a.m32 - a.m20*a.m02*a.m33 + a.m20*a.m03*a.m32 + a.m30*a.m02*a.m23 - a.m30*a.m03*a.m22,
-            m12: -a.m00*a.m12*a.m33 + a.m00*a.m13*a.m32 + a.m10*a.m02*a.m33 - a.m10*a.m03*a.m32 - a.m30*a.m02*a.m13 + a.m30*a.m03*a.m12,
-            m20:  a.m10*a.m21*a.m33 - a.m10*a.m23*a.m31 - a.m20*a.m11*a.m33 + a.m20*a.m13*a.m31 + a.m30*a.m11*a.m23 - a.m30*a.m13*a.m21,
-            m13:  a.m00*a.m12*a.m23 - a.m00*a.m13*a.m22 - a.m10*a.m02*a.m23 + a.m10*a.m03*a.m22 + a.m20*a.m02*a.m13 - a.m20*a.m03*a.m12,
-            m21: -a.m00*a.m21*a.m33 + a.m00*a.m23*a.m31 + a.m20*a.m01*a.m33 - a.m20*a.m03*a.m31 - a.m30*a.m01*a.m23 + a.m30*a.m03*a.m21,
-            m22:  a.m00*a.m11*a.m33 - a.m00*a.m13*a.m31 - a.m10*a.m01*a.m33 + a.m10*a.m03*a.m31 + a.m30*a.m01*a.m13 - a.m30*a.m03*a.m11,
-            m23: -a.m00*a.m11*a.m23 + a.m00*a.m13*a.m21 + a.m10*a.m01*a.m23 - a.m10*a.m03*a.m21 - a.m20*a.m01*a.m13 + a.m20*a.m03*a.m11,
-            m30: -a.m10*a.m21*a.m32 + a.m10*a.m22*a.m31 + a.m20*a.m11*a.m32 - a.m20*a.m12*a.m31 - a.m30*a.m11*a.m22 + a.m30*a.m12*a.m21,
-            m31:  a.m00*a.m21*a.m32 - a.m00*a.m22*a.m31 - a.m20*a.m01*a.m32 + a.m20*a.m02*a.m31 + a.m30*a.m01*a.m22 - a.m30*a.m02*a.m21,
-            m32: -a.m00*a.m11*a.m32 + a.m00*a.m12*a.m31 + a.m10*a.m01*a.m32 - a.m10*a.m02*a.m31 - a.m30*a.m01*a.m12 + a.m30*a.m02*a.m11,
-            m33:  a.m00*a.m11*a.m22 - a.m00*a.m12*a.m21 - a.m10*a.m01*a.m22 + a.m10*a.m02*a.m21 + a.m20*a.m01*a.m12 - a.m20*a.m02*a.m11,
-        };
+        let a2323 = m.m22 * m.m33 - m.m23 * m.m32;
+        let a1323 = m.m21 * m.m33 - m.m23 * m.m31;
+        let a1223 = m.m21 * m.m32 - m.m22 * m.m31;
+        let a0323 = m.m20 * m.m33 - m.m23 * m.m30;
+        let a0223 = m.m20 * m.m32 - m.m22 * m.m30;
+        let a0123 = m.m20 * m.m31 - m.m21 * m.m30;
+        let a2313 = m.m12 * m.m33 - m.m13 * m.m32;
+        let a1313 = m.m11 * m.m33 - m.m13 * m.m31;
+        let a1213 = m.m11 * m.m32 - m.m12 * m.m31;
+        let a2312 = m.m12 * m.m23 - m.m13 * m.m22;
+        let a1312 = m.m11 * m.m23 - m.m13 * m.m21;
+        let a1212 = m.m11 * m.m22 - m.m12 * m.m21;
+        let a0313 = m.m10 * m.m33 - m.m13 * m.m30;
+        let a0213 = m.m10 * m.m32 - m.m12 * m.m30;
+        let a0312 = m.m10 * m.m23 - m.m13 * m.m20;
+        let a0212 = m.m10 * m.m22 - m.m12 * m.m20;
+        let a0113 = m.m10 * m.m31 - m.m11 * m.m30;
+        let a0112 = m.m10 * m.m21 - m.m11 * m.m20;
 
-        let det = a.m00 * inv.m00 + a.m01 * inv.m10 + a.m02 * inv.m20 + a.m03 * inv.m30;
+        let z0 = m.m11 * a2323 - m.m12 * a1323 + m.m13 * a1223;
+        let z1 = m.m10 * a2323 - m.m12 * a0323 + m.m13 * a0223;
+        let z2 = m.m10 * a1323 - m.m11 * a0323 + m.m13 * a0123;
+        let z3 = m.m10 * a1223 - m.m11 * a0223 + m.m12 * a0123;
+
+        let det = m.m00 * z0 - m.m01 * z1 + m.m02 * z2 - m.m03 * z3;
 
         if !det.is_normal() {
             return None;
@@ -260,6 +266,23 @@ impl Matrix4 {
 
         let inv_det = 1.0 / det;
 
-        Some(inv * inv_det)
+        Some(Matrix4 {
+            m00: inv_det *   z0,
+            m01: inv_det * - ( m.m01 * a2323 - m.m02 * a1323 + m.m03 * a1223 ),
+            m02: inv_det *   ( m.m01 * a2313 - m.m02 * a1313 + m.m03 * a1213 ),
+            m03: inv_det * - ( m.m01 * a2312 - m.m02 * a1312 + m.m03 * a1212 ),
+            m10: inv_det * - z1,
+            m11: inv_det *   ( m.m00 * a2323 - m.m02 * a0323 + m.m03 * a0223 ),
+            m12: inv_det * - ( m.m00 * a2313 - m.m02 * a0313 + m.m03 * a0213 ),
+            m13: inv_det *   ( m.m00 * a2312 - m.m02 * a0312 + m.m03 * a0212 ),
+            m20: inv_det *   z2,
+            m21: inv_det * - ( m.m00 * a1323 - m.m01 * a0323 + m.m03 * a0123 ),
+            m22: inv_det *   ( m.m00 * a1313 - m.m01 * a0313 + m.m03 * a0113 ),
+            m23: inv_det * - ( m.m00 * a1312 - m.m01 * a0312 + m.m03 * a0112 ),
+            m30: inv_det * - z3,
+            m31: inv_det *   ( m.m00 * a1223 - m.m01 * a0223 + m.m02 * a0123 ),
+            m32: inv_det * - ( m.m00 * a1213 - m.m01 * a0213 + m.m02 * a0113 ),
+            m33: inv_det *   ( m.m00 * a1212 - m.m01 * a0212 + m.m02 * a0112 ),
+        })
     }
 }
