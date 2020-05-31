@@ -7,8 +7,6 @@ use std::ops::{Add, Div, Mul, Sub};
 
 use wasm_bindgen::prelude::*;
 
-pub mod bindings;
-
 #[wasm_bindgen]
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[repr(C)]
@@ -57,6 +55,7 @@ macro_rules! impl_vec_binary_op {
         impl $op for $name {
             type Output = Self;
 
+            #[inline]
             fn $method(self, rhs: Self) -> Self {
                 $name {
                     x: $op::$method(self.x, rhs.x),
@@ -69,11 +68,23 @@ macro_rules! impl_vec_binary_op {
         impl $op<f32> for $name {
             type Output = Self;
 
+            #[inline]
             fn $method(self, rhs: f32) -> Self {
                 $name {
                     x: $op::$method(self.x, rhs),
                     y: $op::$method(self.y, rhs),
                     z: $op::$method(self.z, rhs),
+                }
+            }
+        }
+
+        #[wasm_bindgen]
+        impl $name {
+            pub fn $method(&self, rhs: &$name) -> $name {
+                $name {
+                    x: $op::$method(self.x, rhs.x),
+                    y: $op::$method(self.y, rhs.y),
+                    z: $op::$method(self.z, rhs.z),
                 }
             }
         }
@@ -144,42 +155,46 @@ impl_mat_binary_op!(Sub::sub for Matrix4);
 impl_mat_binary_op!(Mul::mul for Matrix4);
 impl_mat_binary_op!(Div::div for Matrix4);
 
+#[wasm_bindgen]
 impl Vector3 {
-    pub const fn new(x: f32, y: f32, z: f32) -> Vector3 {
+    pub fn new(x: f32, y: f32, z: f32) -> Vector3 {
         Vector3 { x, y, z }
     }
 
-    pub fn dot(self, other: Self) -> f32 {
+    pub fn dot(&self, other: &Vector3) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
-    pub fn norm_squared(self) -> f32 {
+    pub fn norm_squared(&self) -> f32 {
         self.dot(self)
     }
 
-    pub fn norm(self) -> f32 {
+    pub fn norm(&self) -> f32 {
         self.norm_squared().sqrt()
     }
 
     #[inline]
-    pub fn normalize(mut self) -> Vector3 {
-        let n = self.norm();
-        self.x /= n;
-        self.y /= n;
-        self.z /= n;
-        self
+    pub fn normalize(&self) -> Vector3 {
+        *self / self.norm()
     }
 }
 
 impl Point3 {
-    pub const ORIGIN: Point3 = Point3::new(0.0, 0.0, 0.0);
+    pub const ORIGIN: Point3 = Point3 {
+        x: 0.0,
+        y: 0.0,
+        z: 0.0,
+    };
+}
 
-    pub const fn new(x: f32, y: f32, z: f32) -> Point3 {
+#[wasm_bindgen]
+impl Point3 {
+    pub fn new(x: f32, y: f32, z: f32) -> Point3 {
         Point3 { x, y, z }
     }
 
-    pub fn distance(self, other: Self) -> f32 {
-        (self - other).norm()
+    pub fn distance(&self, other: &Point3) -> f32 {
+        (*self - *other).norm()
     }
 }
 
@@ -207,8 +222,30 @@ impl Add<Vector3> for Point3 {
     }
 }
 
+#[wasm_bindgen]
+impl Point3 {
+    pub fn sub(&self, rhs: &Point3) -> Vector3 {
+        *self - *rhs
+    }
+
+    pub fn add(&self, rhs: &Vector3) -> Point3 {
+        *self + *rhs
+    }
+}
+
+#[wasm_bindgen]
 impl Matrix4 {
-    pub fn transpose(self) -> Self {
+    #[rustfmt::skip]
+    pub fn new(
+        m00: f32, m01: f32, m02: f32, m03: f32,
+        m10: f32, m11: f32, m12: f32, m20: f32,
+        m13: f32, m21: f32, m22: f32, m23: f32,
+        m30: f32, m31: f32, m32: f32, m33: f32,
+    ) -> Matrix4 {
+        Matrix4 { m00, m01, m02, m03, m10, m11, m12, m20, m13, m21, m22, m23, m30, m31, m32, m33 }
+    }
+
+    pub fn transpose(&self) -> Matrix4 {
         Matrix4 {
             m00: self.m00,
             m01: self.m10,
@@ -231,7 +268,7 @@ impl Matrix4 {
 
     /// https://stackoverflow.com/a/44446912/2083075 for optimized scalar version
     #[rustfmt::skip]
-    pub fn inverse(&self) -> Option<Self> {
+    pub fn inverse(&self) -> Option<Matrix4> {
         let m = self;
 
         let a2323 = m.m22 * m.m33 - m.m23 * m.m32;
