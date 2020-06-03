@@ -2,7 +2,7 @@ use wasm_bindgen::prelude::*;
 use yew::prelude::*;
 use yewtil::NeqAssign;
 
-pub struct BodyModel {
+pub struct Model {
     pub link: ComponentLink<Self>,
     pub props: Properties,
 }
@@ -13,12 +13,12 @@ pub enum Msg {}
 #[derive(Clone, Properties, Serialize, Deserialize, PartialEq)]
 pub struct Properties {}
 
-impl Component for BodyModel {
+impl Component for Model {
     type Message = Msg;
     type Properties = Properties;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        BodyModel { link, props }
+        Model { link, props }
     }
 
     fn update(&mut self, _msg: Self::Message) -> ShouldRender {

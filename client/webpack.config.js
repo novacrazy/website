@@ -51,7 +51,7 @@ module.exports = (env, argv) => {
         },
 
         plugins: [
-            new BundleAnalyzerPlugin(),
+            //new BundleAnalyzerPlugin(),
             new HtmlWebpackPlugin({
                 title: 'Custom template',
                 // Load a custom template (lodash by default)
