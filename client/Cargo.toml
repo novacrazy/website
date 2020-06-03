@@ -1,5 +1,5 @@
 [package]
-name = "wasm-nova"
+name = "nova-client"
 version = "0.1.0"
 authors = ["novacrazy <novacrazy@gmail.com>"]
 edition = "2018"
@@ -13,6 +13,8 @@ wasm-bindgen = "0.2"
 cfg-if = "0.1.10"
 wee_alloc = { version = "0.4.5", optional = true }
 serde = { version = "1.0", features = ["derive"] }
+yew = { git = "https://github.com/yewstack/yew" }
+yewtil = { git = "https://github.com/yewstack/yew" }
 
 [features]
 default = ["wee_alloc"]

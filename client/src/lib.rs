@@ -1,8 +1,14 @@
+#![allow(unused_imports)]
+
 #[macro_use]
 extern crate serde;
 
 use cfg_if::cfg_if;
 
+#[macro_use]
+pub mod js;
+
+pub mod components;
 pub mod geometry;
 
 cfg_if! {

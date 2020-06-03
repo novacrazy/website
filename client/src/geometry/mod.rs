@@ -5,29 +5,21 @@
 
 use std::ops::{Add, Div, Mul, Sub};
 
-use wasm_bindgen::prelude::*;
-
-#[wasm_bindgen]
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-#[repr(C)]
 pub struct Vector3 {
     pub x: f32,
     pub y: f32,
     pub z: f32,
 }
 
-#[wasm_bindgen]
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-#[repr(C)]
 pub struct Point3 {
     pub x: f32,
     pub y: f32,
     pub z: f32,
 }
 
-#[wasm_bindgen]
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-#[repr(C)]
 pub struct Matrix4 {
     pub m00: f32,
     pub m01: f32,
@@ -74,17 +66,6 @@ macro_rules! impl_vec_binary_op {
                     x: $op::$method(self.x, rhs),
                     y: $op::$method(self.y, rhs),
                     z: $op::$method(self.z, rhs),
-                }
-            }
-        }
-
-        #[wasm_bindgen]
-        impl $name {
-            pub fn $method(&self, rhs: &$name) -> $name {
-                $name {
-                    x: $op::$method(self.x, rhs.x),
-                    y: $op::$method(self.y, rhs.y),
-                    z: $op::$method(self.z, rhs.z),
                 }
             }
         }
@@ -155,46 +136,38 @@ impl_mat_binary_op!(Sub::sub for Matrix4);
 impl_mat_binary_op!(Mul::mul for Matrix4);
 impl_mat_binary_op!(Div::div for Matrix4);
 
-#[wasm_bindgen]
 impl Vector3 {
-    pub fn new(x: f32, y: f32, z: f32) -> Vector3 {
+    pub const fn new(x: f32, y: f32, z: f32) -> Vector3 {
         Vector3 { x, y, z }
     }
 
-    pub fn dot(&self, other: &Vector3) -> f32 {
+    pub fn dot(self, other: Vector3) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
-    pub fn norm_squared(&self) -> f32 {
+    pub fn norm_squared(self) -> f32 {
         self.dot(self)
     }
 
-    pub fn norm(&self) -> f32 {
+    pub fn norm(self) -> f32 {
         self.norm_squared().sqrt()
     }
 
     #[inline]
-    pub fn normalize(&self) -> Vector3 {
-        *self / self.norm()
+    pub fn normalize(self) -> Vector3 {
+        self / self.norm()
     }
 }
 
 impl Point3 {
-    pub const ORIGIN: Point3 = Point3 {
-        x: 0.0,
-        y: 0.0,
-        z: 0.0,
-    };
-}
+    pub const ORIGIN: Point3 = Point3::new(0.0, 0.0, 0.0);
 
-#[wasm_bindgen]
-impl Point3 {
-    pub fn new(x: f32, y: f32, z: f32) -> Point3 {
+    pub const fn new(x: f32, y: f32, z: f32) -> Point3 {
         Point3 { x, y, z }
     }
 
-    pub fn distance(&self, other: &Point3) -> f32 {
-        (*self - *other).norm()
+    pub fn distance(self, other: Point3) -> f32 {
+        (self - other).norm()
     }
 }
 
@@ -222,21 +195,9 @@ impl Add<Vector3> for Point3 {
     }
 }
 
-#[wasm_bindgen]
-impl Point3 {
-    pub fn sub(&self, rhs: &Point3) -> Vector3 {
-        *self - *rhs
-    }
-
-    pub fn add(&self, rhs: &Vector3) -> Point3 {
-        *self + *rhs
-    }
-}
-
-#[wasm_bindgen]
 impl Matrix4 {
     #[rustfmt::skip]
-    pub fn new(
+    pub const fn new(
         m00: f32, m01: f32, m02: f32, m03: f32,
         m10: f32, m11: f32, m12: f32, m20: f32,
         m13: f32, m21: f32, m22: f32, m23: f32,
