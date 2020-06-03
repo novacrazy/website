@@ -75,33 +75,31 @@ impl Component for Navbar {
 
     fn view(&self) -> Html {
         let mut classes = Classes::new();
-        classes.push("navbar");
+        classes.push("navbar flex-row");
 
         classes.push(match self.props.theme {
             NavbarTheme::Light => "navbar-light",
             NavbarTheme::Dark => "navbar-dark",
         });
 
-        if self.props.expand != NavbarSize::Default {
-            classes.push(match self.props.expand {
-                NavbarSize::Default => unsafe { std::hint::unreachable_unchecked() },
-                NavbarSize::Small => "navbar-expand-sm",
-                NavbarSize::Medium => "navbar-expand-md",
-                NavbarSize::Large => "navbar-expand-lg",
-                NavbarSize::ExtraLarge => "navbar-expand-xl",
-            });
-        }
+        classes.push(match self.props.expand {
+            NavbarSize::Default => "navbar-expand",
+            NavbarSize::Small => "navbar-expand-sm",
+            NavbarSize::Medium => "navbar-expand-md",
+            NavbarSize::Large => "navbar-expand-lg",
+            NavbarSize::ExtraLarge => "navbar-expand-xl",
+        });
 
         self.props.bg.as_str().map(|bg| classes.push(bg));
 
         html! {
-            <nav class={classes} style={&self.props.style}>
+            <header class={classes} style={&self.props.style}>
                 { self.props.brand.clone() }
                 <NavbarCollapseToggler on_toggle={self.link.callback(|value| NavbarMsg::SetCollapse(value))}/>
                 <NavbarCollapse collapsed={self.collapsed}>
                     { self.props.children.render() }
                 </NavbarCollapse>
-            </nav>
+            </header>
         }
     }
 }
