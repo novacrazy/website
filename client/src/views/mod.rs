@@ -5,7 +5,10 @@ use yew_router::prelude::*;
 use yew_router::switch::{AllowMissing, Permissive};
 use yewtil::NeqAssign;
 
-pub struct Model {
+pub mod index;
+pub mod portfolio;
+
+pub struct MainView {
     pub link: ComponentLink<Self>,
     pub props: Properties,
 
@@ -14,14 +17,14 @@ pub struct Model {
 }
 
 #[derive(Clone)]
-pub enum Msg {
+pub enum MainMsg {
     Navigate(Route),
 }
 
 #[derive(Clone, Properties, Serialize, Deserialize, PartialEq)]
 pub struct Properties {}
 
-use super::bootstrap::{
+use crate::components::bootstrap::{
     grid::{Col, Container, Row},
     navbar::{Nav, NavItem, Navbar, NavbarBrand, NavbarCollapse, NavbarCollapseToggler},
     progress::{Progress, ProgressBar},
@@ -30,7 +33,7 @@ use super::bootstrap::{
 #[derive(Clone, Switch, PartialEq)]
 pub enum AppRoute {
     #[to = "/#"]
-    Main,
+    Index,
 
     #[to = "/portfolio"]
     Portfolio,
@@ -41,31 +44,31 @@ pub enum AppRoute {
 
 fn redirect(route: Route) -> AppRoute {
     match route.as_str() {
-        "" | "/" | "/#" => AppRoute::Main,
+        "" | "/" | "/#" => AppRoute::Index,
         _ => AppRoute::PageNotFound(Permissive(Some(route.route))),
     }
 }
 
-impl Component for Model {
-    type Message = Msg;
+impl Component for MainView {
+    type Message = MainMsg;
     type Properties = Properties;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let callback = link.callback(Msg::Navigate);
+        let callback = link.callback(MainMsg::Navigate);
         let mut router_agent = RouteAgentBridge::new(callback);
         router_agent.send(RouteRequest::GetCurrentRoute);
 
-        Model {
+        MainView {
             link,
             props,
-            route: AppRoute::Main,
+            route: AppRoute::Index,
             router_agent,
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::Navigate(route) => {
+            MainMsg::Navigate(route) => {
                 self.route = AppRoute::switch(route.clone()).unwrap_or_else(|| redirect(route));
             }
         }
@@ -85,7 +88,7 @@ impl Component for Model {
                 <Navbar style="border-bottom: 1px solid #888;" expand="small" bg="dark"
                     brand={html! { <NavbarBrand>{"@Nova"}</NavbarBrand> }}>
                     <Nav>
-                        <NavItem><RouterAnchor<AppRoute> route=AppRoute::Main classes={navlink(AppRoute::Main)}>
+                        <NavItem><RouterAnchor<AppRoute> route=AppRoute::Index classes={navlink(AppRoute::Index)}>
                             {"Home"}
                         </RouterAnchor<AppRoute>></NavItem>
                         <NavItem><RouterAnchor<AppRoute> route=AppRoute::Portfolio classes={navlink(AppRoute::Portfolio)}>
@@ -96,10 +99,10 @@ impl Component for Model {
 
                 <Router<AppRoute>
                     render = Router::render(|switch: AppRoute| {
-                        use super::views::{main::MainView, portfolio::PortfolioView};
+                        use self::{index::IndexView, portfolio::PortfolioView};
 
                         match switch {
-                            AppRoute::Main => html! {<MainView/>},
+                            AppRoute::Index => html! {<IndexView/>},
                             AppRoute::Portfolio => html! {<PortfolioView/>},
                             AppRoute::PageNotFound(Permissive(None)) => html!{"Page not found"},
                             AppRoute::PageNotFound(Permissive(Some(missed_route))) => html!{format!("Page '{}' not found", missed_route)}

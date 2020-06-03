@@ -2,14 +2,14 @@ use yew::prelude::*;
 use yewtil::{NeqAssign, Pure, PureComponent};
 
 #[derive(Clone, Properties, PartialEq)]
-pub struct MainViewProps {}
+pub struct IndexViewProps {}
 
-impl PureComponent for MainViewProps {
+impl PureComponent for IndexViewProps {
     fn render(&self) -> Html {
         html! {
-            <div>{"Hello, Main!"}</div>
+            <div>{"Hello, Index!"}</div>
         }
     }
 }
 
-pub type MainView = Pure<MainViewProps>;
+pub type IndexView = Pure<IndexViewProps>;
