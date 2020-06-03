@@ -1,4 +1,6 @@
 pub mod body;
+pub mod bootstrap;
+pub mod navbar;
 
 use wasm_bindgen::prelude::*;
 
