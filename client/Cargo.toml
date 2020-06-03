@@ -16,6 +16,7 @@ serde = { version = "1.0", features = ["derive"] }
 yew = { git = "https://github.com/yewstack/yew" }
 yewtil = { git = "https://github.com/yewstack/yew" }
 float-ord = "0.2.0"
+web-sys = "0.3.40"
 
 [features]
 default = ["wee_alloc"]

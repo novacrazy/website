@@ -1,3 +1,5 @@
+use yew::virtual_dom::{Transformer, VComp};
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum Background {
     None,
@@ -5,6 +7,9 @@ pub enum Background {
     Info,
     Warning,
     Danger,
+    Primary,
+    Light,
+    Dark,
 }
 
 impl Background {
@@ -15,6 +20,9 @@ impl Background {
             Background::Info => "bg-info",
             Background::Warning => "bg-warning",
             Background::Danger => "bg-danger",
+            Background::Primary => "bg-primary",
+            Background::Light => "bg-light",
+            Background::Dark => "bg-dark",
         })
     }
 }
@@ -25,8 +33,6 @@ impl Default for Background {
     }
 }
 
-use yew::virtual_dom::{Transformer, VComp};
-
 impl Transformer<&str, Background> for VComp {
     fn transform(from: &str) -> Background {
         match from {
@@ -34,6 +40,9 @@ impl Transformer<&str, Background> for VComp {
             "bg-info" | "info" => Background::Info,
             "bg-warning" | "warning" => Background::Warning,
             "bg-danger" | "danger" => Background::Danger,
+            "bg-primary" | "primary" => Background::Primary,
+            "bg-light" | "light" => Background::Light,
+            "bg-dark" | "dark" => Background::Dark,
             _ => Background::None,
         }
     }
