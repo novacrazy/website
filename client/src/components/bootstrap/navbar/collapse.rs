@@ -12,8 +12,8 @@ pub struct NavbarCollapseProps {
     #[prop_or_default]
     pub collapsed: bool,
 
-    #[prop_or("navbar-collapse".to_owned())]
-    pub id: String,
+    #[prop_or_default]
+    pub id: Option<String>,
 }
 
 impl PureComponent for NavbarCollapseProps {
@@ -26,8 +26,10 @@ impl PureComponent for NavbarCollapseProps {
             classes.push("show");
         }
 
+        let id = self.id.as_ref().map(|id| id.as_str()).unwrap_or("navbar-collapse");
+
         html! {
-            <div class={classes} id={self.id.as_str()}>{ self.children.render() }</div>
+            <div class={classes} id={id}>{ self.children.render() }</div>
         }
     }
 }
@@ -50,8 +52,11 @@ pub enum NavbarCollapseTogglerMsg {
 pub struct NavbarCollapseTogglerProps {
     pub on_toggle: Callback<bool>,
 
-    #[prop_or("Toggle Navbar".to_owned())]
-    pub label: String,
+    #[prop_or_default]
+    pub label: Option<String>,
+
+    #[prop_or_default]
+    pub controls: Option<String>,
 }
 
 impl Component for NavbarCollapseToggler {
@@ -90,11 +95,14 @@ impl Component for NavbarCollapseToggler {
             classes.push("collapsed");
         }
 
+        let label = self.props.label.as_ref().map(|label| label.as_str()).unwrap_or("Toggle Navbar");
+        let controls = self.props.controls.as_ref().map(|controls| controls.as_str()).unwrap_or("");
+
         html! {
             <button type="button" class={classes}
-                aria-controls="navbarText"
+                aria-controls={controls}
                 aria-expanded={!self.collapsed}
-                aria-label={self.props.label.as_str()}
+                aria-label={label}
                 onclick={self.link.callback(|_| NavbarCollapseTogglerMsg::Toggle)}
             >
                 <span class="navbar-toggler-icon"/>

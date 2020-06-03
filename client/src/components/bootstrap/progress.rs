@@ -22,7 +22,7 @@ impl PureComponent for ProgressProps {
     }
 }
 
-#[derive(Clone, Copy, Properties, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Copy, Properties, PartialEq)]
 pub struct ProgressBarProps {
     #[prop_or(0.0)]
     pub min: f32,

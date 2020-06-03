@@ -15,8 +15,10 @@ wee_alloc = { version = "0.4.5", optional = true }
 serde = { version = "1.0", features = ["derive"] }
 yew = { git = "https://github.com/yewstack/yew" }
 yewtil = { git = "https://github.com/yewstack/yew" }
+yew-router = { git = "https://github.com/yewstack/yew" }
 float-ord = "0.2.0"
 web-sys = "0.3.40"
+wasm-logger = "0.2.0"
 
 [features]
 default = ["wee_alloc"]

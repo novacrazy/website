@@ -1,6 +1,7 @@
 pub mod body;
 pub mod bootstrap;
 pub mod navbar;
+pub mod views;
 
 use wasm_bindgen::prelude::*;
 
@@ -13,5 +14,7 @@ pub fn bindgen_start() {
 pub fn run_app() {
     log!("Bootstrapping body...");
 
-    yew::App::<body::Model>::new().mount_to_body_with_props(body::Properties {});
+    wasm_logger::init(wasm_logger::Config::default());
+
+    yew::start_app_with_props::<body::Model>(body::Properties {})
 }
