@@ -131,11 +131,10 @@ impl Component for DoomFire {
                             let d = (pa - ba * h).norm();
 
                             if d < SIZE {
-                                let idx = y * self.props.width + x;
+                                let pixel = self.pixels.get_unchecked_mut(y * self.props.width + x);
 
                                 let fire = ((36.0 - d).powf(FALLOFF) / norm * 35.0) as usize + 1;
-
-                                self.pixels[idx] = self.pixels[idx].max(fire);
+                                *pixel = fire.max(*pixel).min(36);
                             }
                         }
                     }
@@ -153,8 +152,8 @@ impl Component for DoomFire {
                             *self.pixels.get_unchecked_mut(idx - self.props.width) = 0;
                         } else {
                             let rnd_idx = self.rng.gen_range(0, 4);
-                            let dst = idx - rnd_idx + 1;
-                            *self.pixels.get_unchecked_mut(dst - self.props.width) = pixel - (rnd_idx & 1);
+                            let dst = idx + 1 - rnd_idx;
+                            *self.pixels.get_unchecked_mut(dst.max(self.props.width) - self.props.width) = pixel - (rnd_idx & 1);
                         }
                     }
                 }
