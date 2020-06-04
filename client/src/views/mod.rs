@@ -88,10 +88,14 @@ impl Component for MainView {
                 <Navbar style="border-bottom: 1px solid #888;" expand="small" bg="dark"
                     brand={html! { <NavbarBrand>{"@Nova"}</NavbarBrand> }}>
                     <Nav>
-                        <NavItem><RouterAnchor<AppRoute> route=AppRoute::Index classes={navlink(AppRoute::Index)}>
+                        <NavItem><RouterAnchor<AppRoute>
+                            route=AppRoute::Index
+                            classes={navlink(AppRoute::Index)}>
                             {"Home"}
                         </RouterAnchor<AppRoute>></NavItem>
-                        <NavItem><RouterAnchor<AppRoute> route=AppRoute::Portfolio classes={navlink(AppRoute::Portfolio)}>
+                        <NavItem><RouterAnchor<AppRoute>
+                            route=AppRoute::Portfolio
+                            classes={navlink(AppRoute::Portfolio)}>
                             {"Portfolio"}
                         </RouterAnchor<AppRoute>></NavItem>
                     </Nav>

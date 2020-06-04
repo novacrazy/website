@@ -5,6 +5,10 @@
 
 use std::ops::{Add, Div, Mul, Sub};
 
+pub mod two_d;
+
+pub use self::two_d::*;
+
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Vector3 {
     pub x: f32,
