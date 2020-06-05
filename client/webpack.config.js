@@ -52,7 +52,7 @@ module.exports = (env, argv) => {
         },
 
         plugins: [
-            //new BundleAnalyzerPlugin(),
+            new BundleAnalyzerPlugin(),
             new HtmlWebpackPlugin({
                 title: 'Custom template',
                 // Load a custom template (lodash by default)
@@ -78,9 +78,17 @@ module.exports = (env, argv) => {
             }),
             new WasmPackPlugin({
                 crateDirectory: "./bin/app",
+                //extraArgs: "--target web",
+                watchDirectories: [
+                    path.resolve(__dirname, "src")
+                ]
             }),
             new WasmPackPlugin({
                 crateDirectory: "./bin/native_worker",
+                extraArgs: "--target no-modules",
+                watchDirectories: [
+                    path.resolve(__dirname, "src")
+                ]
             })
         ],
 
