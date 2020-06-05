@@ -27,6 +27,7 @@ module.exports = (env, argv) => {
             port: 9000
         },
 
+        mode: argv.mode || 'production',
         watch: argv.mode !== 'production',
 
         optimization: {
@@ -76,7 +77,10 @@ module.exports = (env, argv) => {
                 }
             }),
             new WasmPackPlugin({
-                crateDirectory: "."
+                crateDirectory: "./bin/app",
+            }),
+            new WasmPackPlugin({
+                crateDirectory: "./bin/native_worker",
             })
         ],
 

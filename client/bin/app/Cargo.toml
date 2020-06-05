@@ -1,0 +1,17 @@
+[package]
+name = "app"
+version = "0.1.0"
+authors = ["novacrazy <novacrazy@gmail.com>"]
+edition = "2018"
+
+[lib]
+path = "app.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+nova-client = { path = "../../" }
+
+yew = { git = "https://github.com/yewstack/yew" }
+wasm-bindgen = "0.2"
+wasm-logger = "0.2.0"
+log = "0.4.8"

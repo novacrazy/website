@@ -1,0 +1,17 @@
+[package]
+name = "native_worker"
+version = "0.1.0"
+authors = ["novacrazy <novacrazy@gmail.com>"]
+edition = "2018"
+
+[lib]
+path = "native_worker.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+nova-client = { path = "../../" }
+
+yew = { git = "https://github.com/yewstack/yew" }
+wasm-bindgen = "0.2"
+wasm-logger = "0.2.0"
+

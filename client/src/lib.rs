@@ -17,21 +17,3 @@ cfg_if! {
         static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
     }
 }
-
-use wasm_bindgen::prelude::*;
-
-#[wasm_bindgen(start)]
-pub fn bindgen_start() {
-    wasm_logger::init(wasm_logger::Config::default());
-
-    log::info!("WASM Started!");
-}
-
-#[wasm_bindgen]
-pub fn run_app() {
-    use views::{MainView, Properties};
-
-    log::info!("Bootstrapping main...");
-
-    yew::start_app_with_props::<MainView>(Properties {})
-}

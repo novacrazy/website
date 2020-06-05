@@ -1,5 +1,5 @@
 import './styles/main.scss';
 
-import("../pkg")
+import("../bin/app/pkg")
   .catch(e => console.error("Error importing `index.js`:", e))
   .then((app) => app.run_app());
