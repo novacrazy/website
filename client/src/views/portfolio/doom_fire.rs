@@ -42,12 +42,18 @@ pub struct DoomFire {
 pub struct DoomFireProps {
     pub width: usize,
     pub height: usize,
+
+    #[prop_or(true)]
+    pub running: bool,
 }
 
 pub enum DoomFireMsg {
     MouseDown(web_sys::MouseEvent),
     MouseUp,
     MouseMove(web_sys::MouseEvent),
+    TouchDown(web_sys::TouchEvent),
+    TouchUp,
+    TouchMove(web_sys::TouchEvent),
     Tick,
     Draw,
 }
@@ -88,6 +94,10 @@ impl Component for DoomFire {
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
+        if !self.props.running {
+            return false;
+        }
+
         let get_mouse_pos = |event: web_sys::MouseEvent| {
             let canvas = self.canvas.cast::<web_sys::HtmlCanvasElement>().unwrap();
             let element: &web_sys::Element = canvas.as_ref();
@@ -100,6 +110,20 @@ impl Component for DoomFire {
             )
         };
 
+        let get_touch_pos = |event: web_sys::TouchEvent| {
+            let canvas = self.canvas.cast::<web_sys::HtmlCanvasElement>().unwrap();
+            let element: &web_sys::Element = canvas.as_ref();
+
+            let rect = element.get_bounding_client_rect();
+
+            let touch = event.touches().get(0).unwrap();
+
+            Vector2::new(
+                (touch.client_x() as f32 - rect.x() as f32).min(self.props.width as f32),
+                (touch.client_y() as f32 - rect.y() as f32).min(self.props.height as f32),
+            )
+        };
+
         match msg {
             DoomFireMsg::MouseDown(event) => {
                 self.pos = get_mouse_pos(event);
@@ -107,9 +131,17 @@ impl Component for DoomFire {
 
                 self.is_drawing = true;
             }
-            DoomFireMsg::MouseUp => self.is_drawing = false,
+            DoomFireMsg::TouchDown(event) => {
+                self.pos = get_touch_pos(event);
+                self.last_pos = self.pos;
+                self.is_drawing = true;
+            }
+            DoomFireMsg::MouseUp | DoomFireMsg::TouchUp => self.is_drawing = false,
             DoomFireMsg::MouseMove(event) if self.is_drawing => {
                 self.pos = get_mouse_pos(event);
+            }
+            DoomFireMsg::TouchMove(event) if self.is_drawing => {
+                self.pos = get_touch_pos(event);
             }
             DoomFireMsg::Tick => unsafe {
                 if self.is_drawing {
@@ -208,19 +240,27 @@ impl Component for DoomFire {
     }
 
     fn change(&mut self, new: Self::Properties) -> ShouldRender {
-        self.props.neq_assign(new)
+        self.props = new;
+        false
     }
 
     fn view(&self) -> Html {
         html! {
             <canvas
                 ref={self.canvas.clone()}
+
                 width={self.props.width}
                 height={self.props.height}
-                style="border: 1px solid black;"
+
+                style="border: 1px solid black; touch-action: none;"
+
                 onmousedown={self.link.callback(DoomFireMsg::MouseDown)}
                 onmouseup={self.link.callback(|_| DoomFireMsg::MouseUp)}
                 onmousemove={self.link.callback(DoomFireMsg::MouseMove)}
+
+                ontouchstart={self.link.callback(|e: web_sys::TouchEvent| { e.prevent_default(); DoomFireMsg::TouchDown(e) })}
+                ontouchend={self.link.callback(|_| DoomFireMsg::TouchUp)}
+                ontouchmove={self.link.callback(|e: web_sys::TouchEvent| { e.prevent_default(); DoomFireMsg::TouchMove(e) })}
             />
         }
     }
