@@ -6,12 +6,17 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const TerserPlugin = require('terser-webpack-plugin');
 const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+let distPath = path.join(__dirname, 'dist');
 
 module.exports = (env, argv) => {
     return {
         watch: true,
         entry: {
             bootstrap: "./www/bootstrap.js",
+            worker: "./www/worker.js",
+            main: "./www/styles/main.scss",
         },
         output: {
             filename: '[name].js',
@@ -22,7 +27,7 @@ module.exports = (env, argv) => {
         devtool: "source-map",
 
         devServer: {
-            contentBase: path.join(__dirname, 'dist'),
+            contentBase: distPath,
             compress: true,
             port: 9000
         },
@@ -53,28 +58,11 @@ module.exports = (env, argv) => {
 
         plugins: [
             new BundleAnalyzerPlugin(),
-            new HtmlWebpackPlugin({
-                title: 'Custom template',
-                // Load a custom template (lodash by default)
-                template: 'www/index.html'
-            }),
             new MiniCssExtractPlugin({
                 // Options similar to the same options in webpackOptions.output
                 // both options are optional
                 filename: "[name].css",
                 chunkFilename: "[id].css"
-            }),
-            new LoaderOptionsPlugin({
-                options: {
-                    posthtml(ctx) {
-                        return {
-                            parser: require('posthtml-pug'),
-                            plugins: [
-                                require('posthtml-bem')()
-                            ]
-                        }
-                    }
-                }
             }),
             new WasmPackPlugin({
                 crateDirectory: "./bin/app",
@@ -89,7 +77,12 @@ module.exports = (env, argv) => {
                 watchDirectories: [
                     path.resolve(__dirname, "src")
                 ]
-            })
+            }),
+            new CopyWebpackPlugin({
+                patterns: [
+                    { from: './www/index.html', to: distPath + '/index.html' }
+                ]
+            }),
         ],
 
         module: {
@@ -114,18 +107,6 @@ module.exports = (env, argv) => {
                         'postcss-loader',
                         'sass-loader',
                     ],
-                },
-                {
-                    test: /\.html$/,
-                    use: [
-                        {
-                            loader: 'html-loader',
-                            options: { minimize: true }
-                        },
-                        {
-                            loader: 'posthtml-loader'
-                        }
-                    ]
                 },
                 {
                     test: /\.modernizrrc$/,
