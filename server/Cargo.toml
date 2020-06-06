@@ -7,3 +7,10 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+hyper = "0.13.6"
+warp = "0.2.3"
+tokio = { version = "0.2.21", features = ["rt-threaded", "signal", "sync", "macros"] }
+
+[profile.release]
+lto = "full"
+opt-level = 3
