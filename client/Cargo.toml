@@ -26,7 +26,11 @@ features = [
     "CanvasRenderingContext2d",
     "ImageData",
     "DomRect",
-    "Element"
+    "Element",
+    "Touch",
+    "TouchEvent",
+    "TouchEvent",
+    "TouchList"
 ]
 
 [features]
@@ -39,5 +43,9 @@ members = [
 ]
 
 [profile.release]
-lto = true
+lto = "fat"
+opt-level = "z"
+
+[profile.dev]
+lto = "fat"
 opt-level = "z"
