@@ -5,6 +5,7 @@ use yew_router::prelude::*;
 use yew_router::switch::{AllowMissing, Permissive};
 use yewtil::NeqAssign;
 
+pub mod about;
 pub mod index;
 pub mod portfolio;
 
@@ -37,6 +38,9 @@ pub enum AppRoute {
 
     #[to = "/portfolio"]
     Portfolio,
+
+    #[to = "/about"]
+    About,
 
     #[to = "/not-found"]
     PageNotFound(Permissive<String>),
@@ -86,7 +90,7 @@ impl Component for MainView {
         html! {
             <>
                 <Navbar style="border-bottom: 1px solid #888;" expand="small" bg="dark"
-                    brand={html! { <NavbarBrand>{"@Nova"}</NavbarBrand> }}>
+                    brand={html! { <RouterAnchor<AppRoute> route=AppRoute::Index classes="navbar-brand">{"@Nova"}</RouterAnchor<AppRoute>> }}>
                     <Nav>
                         <NavItem><RouterAnchor<AppRoute>
                             route=AppRoute::Index
@@ -94,22 +98,41 @@ impl Component for MainView {
                             {"Home"}
                         </RouterAnchor<AppRoute>></NavItem>
                         <NavItem><RouterAnchor<AppRoute>
+                            route=AppRoute::About
+                            classes={navlink(AppRoute::About)}>
+                            {"About"}
+                        </RouterAnchor<AppRoute>></NavItem>
+                        <NavItem><RouterAnchor<AppRoute>
                             route=AppRoute::Portfolio
                             classes={navlink(AppRoute::Portfolio)}>
                             {"Portfolio"}
                         </RouterAnchor<AppRoute>></NavItem>
                     </Nav>
+                    <hr/>
+                    <span class="navbar-text">
+                        {"Powered by Rust/WASM"}
+                    </span>
+                    <a href="https://github.com/rust-lang/rust" target="_blank">
+                        <img style="height:40px" src="https://www.rust-lang.org/logos/rust-logo-blk.svg"/>
+                    </a>
                 </Navbar>
 
                 <Router<AppRoute>
                     render = Router::render(|switch: AppRoute| {
-                        use self::{index::IndexView, portfolio::PortfolioView};
+                        use self::{index::IndexView, portfolio::PortfolioView, about::AboutView};
 
                         match switch {
-                            AppRoute::Index => html! {<IndexView/>},
-                            AppRoute::Portfolio => html! {<PortfolioView/>},
-                            AppRoute::PageNotFound(Permissive(None)) => html!{"Page not found"},
-                            AppRoute::PageNotFound(Permissive(Some(missed_route))) => html!{format!("Page '{}' not found", missed_route)}
+                            AppRoute::PageNotFound(Permissive(None)) => return html!{"Page not found"},
+                            AppRoute::PageNotFound(Permissive(Some(missed_route))) => return html!{format!("Page '{}' not found", missed_route)},
+                            _ => {}
+                        }
+
+                        html! {
+                            <>
+                                <IndexView     running={switch == AppRoute::Index}/>
+                                <AboutView     running={switch == AppRoute::About}/>
+                                <PortfolioView running={switch == AppRoute::Portfolio}/>
+                            </>
                         }
                     })
                     redirect = Router::redirect(redirect)

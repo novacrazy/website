@@ -4,7 +4,10 @@ use yewtil::{NeqAssign, Pure, PureComponent};
 pub mod doom_fire;
 
 #[derive(Clone, Properties, PartialEq)]
-pub struct PortfolioViewProps {}
+pub struct PortfolioViewProps {
+    #[prop_or(true)]
+    pub running: bool,
+}
 
 impl PureComponent for PortfolioViewProps {
     fn render(&self) -> Html {
@@ -17,18 +20,20 @@ impl PureComponent for PortfolioViewProps {
         use doom_fire::DoomFire;
 
         html! {
-            <Container size="fluid">
-                <Row>
-                    <Col>
-                        <div>{"Hello, Portfolio!"}</div>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <DoomFire width=600, height=400/>
-                    </Col>
-                </Row>
-            </Container>
+            <div class={if self.running {""} else {"hidden"} }>
+                <Container size="fluid">
+                    <Row>
+                        <Col>
+                            <div>{"Hello, Portfolio!"}</div>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <DoomFire width=600, height=400 running={self.running}/>
+                        </Col>
+                    </Row>
+                </Container>
+            </div>
         }
     }
 }

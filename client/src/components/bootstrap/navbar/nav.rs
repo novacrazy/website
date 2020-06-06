@@ -28,7 +28,7 @@ pub struct NavItemProps {
 impl PureComponent for NavProps {
     fn render(&self) -> Html {
         html! {
-            <ul class="navbar-nav">{ self.children.render() }</ul>
+            <ul class="navbar-nav mr-auto">{ self.children.render() }</ul>
         }
     }
 }

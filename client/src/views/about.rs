@@ -2,17 +2,17 @@ use yew::prelude::*;
 use yewtil::{NeqAssign, Pure, PureComponent};
 
 #[derive(Clone, Properties, PartialEq)]
-pub struct IndexViewProps {
+pub struct AboutViewProps {
     #[prop_or(true)]
     pub running: bool,
 }
 
-impl PureComponent for IndexViewProps {
+impl PureComponent for AboutViewProps {
     fn render(&self) -> Html {
         html! {
-            <div class={if self.running {""} else {"hidden"}}>{"Hello, Index!"}</div>
+            <div class={if self.running {""} else {"hidden"}}>{"Hello, About!"}</div>
         }
     }
 }
 
-pub type IndexView = Pure<IndexViewProps>;
+pub type AboutView = Pure<AboutViewProps>;
